@@ -14,7 +14,7 @@ def banner():
 
     VERSION = 'v0.3.0'
 
-    print('''
+    print(r'''
      _____                    _             _            _ 
     /  __ \                  | |   ({})     | |          | |
     | /  \/_ __ ___  ___ ___ | |    _ _ __ | | _____  __| |
@@ -38,7 +38,7 @@ def cli():
     s.add_argument('--search', dest='engine', default='google,bing', type=lambda x: utils.delimiter2list(x), help='Search Engine (Default=\'google,bing\')')
 
     o = args.add_argument_group("Output arguments")
-    o.add_argument('-f', dest='nformat', type=str, required=True, help='Format names, ex: \'domain\{f}{last}\', \'{first}.{last}@domain.com\'')
+    o.add_argument('-f', dest='nformat', type=str, required=True, help='Format names, ex: \'domain\\{f}{last}\', \'{first}.{last}@domain.com\'')
     o.add_argument('-o', dest='outfile', type=str, default='names', help='Change name of output file (omit_extension)')
 
     p = args.add_argument_group("Proxy arguments")
