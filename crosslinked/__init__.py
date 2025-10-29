@@ -14,13 +14,13 @@ def banner():
 
     VERSION = 'v0.3.0'
 
-    print(r'''
+    print('''
      _____                    _             _            _ 
-    /  __ \                  | |   ({})     | |          | |
-    | /  \/_ __ ___  ___ ___ | |    _ _ __ | | _____  __| |
-    | |   | '__/ _ \/ __/ __|| |   | | '_ \| |/ / _ \/ _` |
-    | \__/\ | | (_) \__ \__ \| |___| | | | |   <  __/ (_| | {}
-     \____/_|  \___/|___/___/\_____/_|_| |_|_|\_\___|\__,_| {}
+    /  __ \\                  | |   ({})     | |          | |
+    | /  \\/_ __ ___  ___ ___ | |    _ _ __ | | _____  __| |
+    | |   | '__/ _ \\/ __/ __|| |   | | '_ \\| |/ / _ \\/ _` |
+    | \\__/\\ | | (_) \\__ \\__ \\| |___| | | | |   <  __/ (_| | {}
+     \\____/_|  \\___/|___/___/\\_____/_|_| |_|_|\\_\\___|\\__,_| {}
 
     '''.format(highlight('x', fg='gray'),
                highlight("@m8sec", fg='gray'),
@@ -35,10 +35,10 @@ def cli():
     args.add_argument(dest='company_name', nargs='?', help='Target company name')
 
     s = args.add_argument_group("Search arguments")
-    s.add_argument('--search', dest='engine', default='google', type=lambda x: utils.delimiter2list(x), help='Search Engine (Default=\'google,bing\')')
+    s.add_argument('--search', dest='engine', default='google,bing', type=lambda x: utils.delimiter2list(x), help='Search Engine (Default=\'google,bing\')')
 
     o = args.add_argument_group("Output arguments")
-    o.add_argument('-f', dest='nformat', type=str, required=True, help='Format names, ex: \'domain\\{f}{last}\', \'{first}.{last}@domain.com\'')
+    o.add_argument('-f', dest='nformat', type=str, required=True, help='Format names, ex: \'domain\\{f}{last}\', \'{first}.{last}@domain.com\', \'{f}{last-2}@domain.com\' (use {last-1}, {last-2}, or {last-3} to truncate last name)')
     o.add_argument('-o', dest='outfile', type=str, default='names', help='Change name of output file (omit_extension)')
 
     p = args.add_argument_group("Proxy arguments")
@@ -104,6 +104,15 @@ def nformatter(nformat, name):
     val = val.replace('{f}', f_name[0])
     val = val.replace('{first}', f_name)
     val = val.replace('{l}', l_name[0])
+    
+    # Handle truncated last name patterns {last-1}, {last-2}, {last-3}
+    for truncate_count in [1, 2, 3]:
+        pattern = '{{last-{}}}'.format(truncate_count)
+        if pattern in val:
+            # Cut last N letters, but ensure we don't cut more than the length of the name
+            truncated_last = l_name[:-truncate_count] if len(l_name) > truncate_count else l_name
+            val = val.replace(pattern, truncated_last)
+    
     val = val.replace('{last}', l_name)
     return val
 
@@ -126,3 +135,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
